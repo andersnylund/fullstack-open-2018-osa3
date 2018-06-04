@@ -57,6 +57,15 @@ app.delete('/api/persons/:id', (req, res) => {
 app.post('/api/persons', (req, res) => {
 	const body = req.body
 	const id = Math.floor(Math.random() * 10000000000)
+	if (!req.body.name || req.body.name === '') {
+		return res.status(400).json({ error: `Field 'name' must be given a value` }).end()
+	}
+	if (!req.body.number || req.body.name === '') {
+		return res.status(400).json({ error: `Field 'number' must be given a value` }).end()
+	}
+	if (persons.find(p => p.name === req.body.name)) {
+		return res.status(422).json({ error: `Duplicate name. '${req.body.name}' already exists`}).end()
+	}
 	const person = {
 		name: body.name,
 		number: body.number,
