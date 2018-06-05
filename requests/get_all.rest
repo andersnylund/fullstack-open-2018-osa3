@@ -1,1 +1,1 @@
-GET http://localhost:3001/api/persons
+GET https://fullstack-open-2018-osa3-kejkbdbvof.now.sh/api/persons

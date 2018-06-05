@@ -1,7 +1,7 @@
-POST http://localhost:3001/api/persons
+POST https://fullstack-open-2018-osa3-kejkbdbvof.now.sh/api/persons
 Content-Type: application/json
 
 {
-  "name": "Test",
+  "name": "Testi",
   "number": "050-1234567"
 }
