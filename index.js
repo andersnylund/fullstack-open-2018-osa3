@@ -3,19 +3,20 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 
 const app = express()
-const People = require('./models/people')
+const Person = require('./models/person')
 
 app.use(bodyParser.json())
 morgan.token('body', (req, res) => {
 	return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :body :status :res[content-length] - :response-time ms'))
-app.use(express.static('build'))
+// app.use(express.static('build'))
 
 app.get('/api/persons', (req, res) => {
-	People
+	Person
 		.find({})
-		.then(people => res.json(people.map(formatPerson)))
+		.then(persons => res.json(persons.map(Person.format)))
+		.catch(error => console.log(error))
 })
 
 app.get('/info', (req, res) => {
@@ -46,7 +47,6 @@ app.delete('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
 	const body = req.body
-	const id = Math.floor(Math.random() * 10000000000)
 	if (!req.body.name || req.body.name === '') {
 		return res.status(400).json({
 			error: `Field 'name' must be given a value`
@@ -57,27 +57,18 @@ app.post('/api/persons', (req, res) => {
 			error: `Field 'number' must be given a value`
 		}).end()
 	}
-	if (persons.find(p => p.name === req.body.name)) {
-		return res.status(422).json({
-			error: `Duplicate name. '${req.body.name}' already exists`
-		}).end()
-	}
-	const person = {
+	const person = new Person({
 		name: body.name,
-		number: body.number,
-		id
-	}
-	persons = persons.concat(person)
-	res.json(person)
+		number: body.number
+	})
+	person
+		.save()
+		.then(person => {
+			res.json(Person.format(person))
+		})
+		.catch(error => console.log(error))
 })
 
-const formatPerson = (person) => {
-	console.log(person._doc)
-	const formattedPerson = { ...person._doc, id: person._id }
-	delete formattedPerson._id
-	delete formattedPerson.__v
-	return formattedPerson
-}
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
