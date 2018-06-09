@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 
 const app = express()
+const People = require('./models/people')
 
 app.use(bodyParser.json())
 morgan.token('body', (req, res) => {
@@ -11,26 +12,10 @@ morgan.token('body', (req, res) => {
 app.use(morgan(':method :url :body :status :res[content-length] - :response-time ms'))
 app.use(express.static('build'))
 
-let persons = [{
-	"name": "Arto Hellas",
-	"number": "040-123456",
-	"id": 1
-}, {
-	"name": "Martti Tienari",
-	"number": "040-123456",
-	"id": 2
-}, {
-	"name": "Arto Järvinen",
-	"number": "040-123456",
-	"id": 3
-}, {
-	"name": "Lea Kutvonen",
-	"number": "040-123456",
-	"id": 4
-}]
-
 app.get('/api/persons', (req, res) => {
-	res.json(persons)
+	People
+		.find({})
+		.then(people => res.json(people.map(formatPerson)))
 })
 
 app.get('/info', (req, res) => {
@@ -63,13 +48,19 @@ app.post('/api/persons', (req, res) => {
 	const body = req.body
 	const id = Math.floor(Math.random() * 10000000000)
 	if (!req.body.name || req.body.name === '') {
-		return res.status(400).json({ error: `Field 'name' must be given a value` }).end()
+		return res.status(400).json({
+			error: `Field 'name' must be given a value`
+		}).end()
 	}
 	if (!req.body.number || req.body.name === '') {
-		return res.status(400).json({ error: `Field 'number' must be given a value` }).end()
+		return res.status(400).json({
+			error: `Field 'number' must be given a value`
+		}).end()
 	}
 	if (persons.find(p => p.name === req.body.name)) {
-		return res.status(422).json({ error: `Duplicate name. '${req.body.name}' already exists`}).end()
+		return res.status(422).json({
+			error: `Duplicate name. '${req.body.name}' already exists`
+		}).end()
 	}
 	const person = {
 		name: body.name,
@@ -79,6 +70,14 @@ app.post('/api/persons', (req, res) => {
 	persons = persons.concat(person)
 	res.json(person)
 })
+
+const formatPerson = (person) => {
+	console.log(person._doc)
+	const formattedPerson = { ...person._doc, id: person._id }
+	delete formattedPerson._id
+	delete formattedPerson.__v
+	return formattedPerson
+}
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
