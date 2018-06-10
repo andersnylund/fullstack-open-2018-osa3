@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 
 require('dotenv').config()
 
-const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ds147450.mlab.com:47450/fullstack-application`
+const url = `mongodb://user:secret@localhost:27017`
 
 mongoose.connect(url)
 
