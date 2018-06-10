@@ -10,7 +10,7 @@ morgan.token('body', (req, res) => {
 	return JSON.stringify(req.body)
 })
 app.use(morgan(':method :url :body :status :res[content-length] - :response-time ms'))
-// app.use(express.static('build'))
+app.use(express.static('build'))
 
 app.get('/api/persons', (req, res) => {
 	Person

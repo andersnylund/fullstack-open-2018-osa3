@@ -1,9 +1,11 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-require('dotenv').config()
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
 
-const url = `mongodb://user:secret@localhost:27017`
+const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_PATH}`
 
 mongoose.connect(url)
 
