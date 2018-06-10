@@ -25,13 +25,19 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/persons/:id', (req, res) => {
-	const id = Number(req.params.id)
-	const person = persons.find(p => p.id === id)
-	if (person) {
-		res.json(person)
-	} else {
-		res.status(404).end()
-	}
+	Person
+		.findById(req.params.id)
+		.then(person => {
+			if (person) {
+				res.json(Person.format(person))
+			} else {
+				res.status(404).send({error: 'id not found'})
+			}
+		})
+		.catch(error => {
+			console.log(error)
+			res.status(400).send({error: 'malformed id'})
+		})
 })
 
 app.delete('/api/persons/:id', (req, res) => {
