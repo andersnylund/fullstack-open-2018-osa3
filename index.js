@@ -44,7 +44,6 @@ app.delete('/api/persons/:id', (req, res) => {
 			console.log(error)
 			res.status(400).send({ error: 'malformed id' })
 		})
-
 })
 
 app.post('/api/persons', (req, res) => {
@@ -69,6 +68,28 @@ app.post('/api/persons', (req, res) => {
 			res.json(Person.format(person))
 		})
 		.catch(error => console.log(error))
+})
+
+app.put('/api/persons/:id', (req, res) => {
+	const person = req.body
+	if (!req.body.name || req.body.name === '') {
+		return res.status(400).json({
+			error: `Field 'name' must be given a value`
+		}).end()
+	}
+	if (!req.body.number || req.body.name === '') {
+		return res.status(400).json({
+			error: `Field 'number' must be given a value`
+		}).end()
+	}
+	Person
+		.findByIdAndUpdate(req.params.id, person, {new: true})
+		.then(person => {
+			res.json(Person.format(person))
+		})
+		.catch(error => {
+			console.log(error)
+		})
 })
 
 
