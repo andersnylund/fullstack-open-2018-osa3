@@ -68,12 +68,23 @@ app.post('/api/persons', (req, res) => {
 		name: body.name,
 		number: body.number
 	})
-	person
-		.save()
-		.then(person => {
-			res.json(Person.format(person))
+	Person
+		.find({name: person.name})
+		.then(persons => {
+			if(persons.length !== 0) {
+				res.status(409).send({error: 'name of entry already exists in list'})
+			} else {
+				person
+					.save()
+					.then(person => {
+						res.json(Person.format(person))
+					})
+					.catch(error => console.log(error))
+			}
 		})
-		.catch(error => console.log(error))
+		.catch(error => {
+			console.log(error)
+		})
 })
 
 app.put('/api/persons/:id', (req, res) => {
